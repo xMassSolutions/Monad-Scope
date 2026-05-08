@@ -13,24 +13,23 @@ const Projects = lazy(() => import('./pages/Projects'))
 function Landing() {
   return (
     <div className="relative min-h-screen bg-[#0A0A0B]">
-      {/* Page-wide static backdrop behind lower sections — no animation here, hero carries the motion */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-25"
-        style={{
-          maskImage:
-            'linear-gradient(to bottom, transparent 0%, transparent 60%, rgba(0,0,0,0.6) 80%, rgba(0,0,0,0.3) 100%)',
-          WebkitMaskImage:
-            'linear-gradient(to bottom, transparent 0%, transparent 60%, rgba(0,0,0,0.6) 80%, rgba(0,0,0,0.3) 100%)',
-        }}
-      >
+      {/* Page-wide fluid backdrop — animates the same AVIF behind every section */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <img
           src="/background.avif"
           alt=""
           aria-hidden
           decoding="async"
-          loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="bg-fluid absolute inset-0 w-full h-full object-cover opacity-40"
+          style={{ animationDuration: '40s' }}
+        />
+        {/* Soft radial wash so headlines + cards stay legible without killing the colors */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse at center, rgba(10,10,11,0.25) 0%, rgba(10,10,11,0.55) 70%, rgba(10,10,11,0.8) 100%)',
+          }}
         />
       </div>
       <div className="relative z-10">

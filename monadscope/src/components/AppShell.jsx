@@ -84,7 +84,6 @@ export default function AppShell() {
 
         <div className="mt-auto flex flex-col gap-2 px-1 text-[11px] text-white/30">
           <Link to="/" className="hover:text-white/60 transition-colors">← Back to landing</Link>
-          <span>v0.1 · prototype</span>
         </div>
       </aside>
 

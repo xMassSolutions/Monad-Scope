@@ -25,16 +25,14 @@ export default function FeatureCard({ title, description, icon: Icon, gradient, 
           background: `linear-gradient(#1A1A1C, #1A1A1C) padding-box, ${gradient} border-box`,
         }}
       >
-        <div className="w-full h-full p-7 flex flex-col justify-between">
-          <div className="text-white/90">
+        <div className="w-full h-full p-7 flex flex-col">
+          <div className="text-white/90 mb-6">
             <Icon size={32} strokeWidth={2.5} />
           </div>
-          <div>
-            <h3 className="text-white font-medium text-xl mb-3 tracking-tight">{title}</h3>
-            <p className="text-gray-400 text-[14px] leading-[1.6] font-normal selection:bg-white/20">
-              {description}
-            </p>
-          </div>
+          <h3 className="text-white font-medium text-xl mb-3 tracking-tight">{title}</h3>
+          <p className="text-gray-400 text-[14px] leading-[1.6] font-normal selection:bg-white/20">
+            {description}
+          </p>
         </div>
       </div>
     </motion.div>

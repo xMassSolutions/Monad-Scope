@@ -31,7 +31,7 @@ const cards = [
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="w-full bg-[#0A0A0B] py-24 px-6 md:px-12 scroll-mt-16">
+    <section id="features" className="w-full py-24 px-6 md:px-12 scroll-mt-16">
       {/* Section header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

@@ -33,7 +33,7 @@ export default function DashboardPreview() {
   const chartData = [320, 480, 290, 610, 520, 780, 690, 820, 750, 910]
 
   return (
-    <section id="app-shell" className="w-full bg-[#0A0A0B] py-24 px-6 md:px-12 overflow-hidden scroll-mt-16">
+    <section id="app-shell" className="w-full py-24 px-6 md:px-12 overflow-hidden scroll-mt-16">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}

@@ -5,49 +5,8 @@ import { Link } from 'react-router-dom'
 export default function HeroSection() {
   return (
     <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden">
-      {/* Fluid drifting background — single GPU-composited layer */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <img
-          src="/background.avif"
-          alt=""
-          aria-hidden
-          decoding="async"
-          fetchPriority="high"
-          className="bg-fluid absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
-
-      {/* Ambient video on top — subtle motion blend, defer load */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="metadata"
-        poster="/background.avif"
-        className="absolute inset-0 w-full h-full object-cover z-[1] opacity-30 mix-blend-screen pointer-events-none"
-      >
-        <source
-          src="https://res.cloudinary.com/dfonotyfb/video/upload/v1775585556/dds3_1_rqhg7x.mp4"
-          type="video/mp4"
-        />
-      </video>
-
-      {/* Dark overlay — radial vignette + bottom fade for text legibility */}
-      <div
-        className="absolute inset-0 z-10"
-        style={{
-          background:
-            'radial-gradient(ellipse at center, rgba(10,10,11,0.55) 0%, rgba(10,10,11,0.75) 60%, rgba(10,10,11,0.92) 100%)',
-        }}
-      />
-      <div
-        className="absolute inset-0 z-10"
-        style={{
-          background:
-            'linear-gradient(to bottom, rgba(10,10,11,0.4) 0%, rgba(10,10,11,0) 25%, rgba(10,10,11,0) 70%, rgba(10,10,11,0.95) 100%)',
-        }}
-      />
+      {/* Hero shares the page-wide fluid backdrop — no local overlay, so the
+          section blends seamlessly into the rest of the landing page. */}
 
       {/* Navbar */}
       <nav className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 md:px-12 py-6">

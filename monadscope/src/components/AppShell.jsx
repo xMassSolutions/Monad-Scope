@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { Activity, Search, Library, Network, ShieldAlert } from 'lucide-react'
+import ContractPill from './ContractPill'
 
 function StatusPill() {
   const [health, setHealth] = useState(null)
@@ -50,7 +51,7 @@ export default function AppShell() {
       {/* Sidebar */}
       <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-white/8 p-4 sticky top-0 h-screen" style={{ background: 'rgba(0,0,0,0.4)' }}>
         <Link to="/" className="flex items-center gap-2 mb-8 px-2">
-          <img src="/logo.png" alt="MonadScope" className="w-7 h-7 object-contain" />
+          <img src="/logo.png" alt="MonadScope" decoding="async" className="w-7 h-7 object-contain" />
           <span className="text-white font-semibold text-sm tracking-tight">MonadScope</span>
         </Link>
 
@@ -84,7 +85,6 @@ export default function AppShell() {
 
         <div className="mt-auto flex flex-col gap-2 px-1 text-[11px] text-white/30">
           <Link to="/" className="hover:text-white/60 transition-colors">← Back to landing</Link>
-          <span>v0.1 · prototype</span>
         </div>
       </aside>
 
@@ -95,7 +95,10 @@ export default function AppShell() {
             <Activity size={14} className="text-cyan-400" />
             <span>Live ingest · Monad mainnet</span>
           </div>
-          <StatusPill />
+          <div className="flex items-center gap-3">
+            <ContractPill address="0x1051bC8E0b7a986aae8117F631B0E155185515f5" />
+            <StatusPill />
+          </div>
         </header>
         <div className="p-6 md:p-8">
           <Outlet />

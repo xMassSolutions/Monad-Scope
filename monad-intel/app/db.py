@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
@@ -28,11 +29,28 @@ def get_engine() -> AsyncEngine:
     global _engine
     if _engine is None:
         settings = get_settings()
+
+        connect_args: dict = {}
+        # If using Postgres, set the search_path so all queries land in the
+        # configured schema (default "monadscope"). Lets us share a Supabase
+        # project with other apps without table-name collisions. SQLite
+        # ignores this (and asyncpg doesn't accept "options").
+        is_pg = settings.database_url.startswith(("postgres", "postgresql"))
+        if is_pg:
+            schema = (
+                getattr(settings, "database_schema", None)
+                or os.getenv("DATABASE_SCHEMA")
+                or "monadscope"
+            )
+            # asyncpg uses server_settings rather than libpq "options".
+            connect_args["server_settings"] = {"search_path": f"{schema},public"}
+
         _engine = create_async_engine(
             settings.database_url,
             echo=settings.database_echo,
             pool_pre_ping=True,
             future=True,
+            connect_args=connect_args,
         )
     return _engine
 

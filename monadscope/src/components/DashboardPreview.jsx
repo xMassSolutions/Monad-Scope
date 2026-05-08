@@ -33,7 +33,7 @@ export default function DashboardPreview() {
   const chartData = [320, 480, 290, 610, 520, 780, 690, 820, 750, 910]
 
   return (
-    <section id="app-shell" className="w-full bg-[#0A0A0B] py-24 px-6 md:px-12 overflow-hidden scroll-mt-16">
+    <section id="app-shell" className="w-full py-24 px-6 md:px-12 overflow-hidden scroll-mt-16">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -50,8 +50,11 @@ export default function DashboardPreview() {
             Contract Intelligence Dashboard
           </h2>
           <p className="text-white/40 text-base max-w-md mx-auto">
-            Real-time risk scoring, findings, and linked contract graphs — all in one view.
+            Risk score, findings, and prime status — every Monad contract in one unified view.
           </p>
+          <div className="mt-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-white/10 text-[10px] uppercase tracking-widest text-white/40">
+            <span className="w-1 h-1 rounded-full bg-amber-400" /> Demo · sample contract
+          </div>
         </div>
 
         {/* Dashboard mockup */}
@@ -66,7 +69,7 @@ export default function DashboardPreview() {
             {/* Sidebar */}
             <div className="hidden md:flex flex-col w-52 border-r border-white/8 p-4 gap-1" style={{ background: 'rgba(0,0,0,0.3)' }}>
               <div className="flex items-center gap-2 mb-6 px-2">
-                <img src="/logo.png" alt="MonadScope" className="w-6 h-6 object-contain" />
+                <img src="/logo.png" alt="MonadScope" decoding="async" loading="lazy" className="w-6 h-6 object-contain" />
                 <span className="text-white/80 text-sm font-semibold">MonadScope</span>
               </div>
               {['Contract intelligence', 'Project graph', 'Public library'].map((item, i) => (

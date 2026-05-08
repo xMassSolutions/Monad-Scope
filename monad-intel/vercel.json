@@ -1,0 +1,27 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "framework": null,
+  "buildCommand": null,
+  "installCommand": "pip install -r requirements.txt",
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "50mb" }
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "api/index.py" }
+  ],
+  "crons": [
+    {
+      "path": "/cron/poll?batch=50",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/cron/backfill?batch=100",
+      "schedule": "30 6 * * *"
+    }
+  ]
+}

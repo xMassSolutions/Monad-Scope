@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.db
+*.sqlite*
+.env
+.env.*
+!.env.example
+tests/
+.pytest_cache/
+.git/
+.DS_Store
+*.log
+/tmp/

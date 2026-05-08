@@ -1,0 +1,41 @@
+name: Poll Monad chain
+
+# GitHub Actions free tier covers ~5-minute cadence on a public repo.
+# Each tick hits the deployed Vercel API which advances the case library
+# by one batch of recent blocks. Keeps the library fresh without paying
+# for Vercel's Pro tier (which is required for sub-daily Vercel Cron).
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit /cron/poll
+        run: |
+          curl -fsS \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            "${API_URL}/cron/poll?batch=20" || true
+        env:
+          API_URL: ${{ secrets.API_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+  backfill:
+    runs-on: ubuntu-latest
+    # Run alongside poll but with a backfill payload — walks one batch
+    # backward into history each tick.
+    steps:
+      - name: Hit /cron/backfill
+        run: |
+          curl -fsS \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            "${API_URL}/cron/backfill?batch=20" || true
+        env:
+          API_URL: ${{ secrets.API_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}

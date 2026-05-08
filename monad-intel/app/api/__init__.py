@@ -6,6 +6,7 @@ from app.api import (
     admin,
     auth,
     contracts,
+    cron,
     health,
     library,
     outcomes,
@@ -26,4 +27,5 @@ def get_api_router() -> APIRouter:
     r.include_router(admin.router, tags=["admin"])
     r.include_router(outcomes.router, tags=["outcomes"])
     r.include_router(rulesets.router, tags=["rulesets"])
+    r.include_router(cron.router, tags=["cron"])
     return r

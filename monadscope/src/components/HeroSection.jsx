@@ -5,29 +5,25 @@ import { Link } from 'react-router-dom'
 export default function HeroSection() {
   return (
     <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden">
-      {/* Fluid drifting background — two layers with offset timing for parallax */}
+      {/* Fluid drifting background — single GPU-composited layer */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <img
           src="/background.avif"
           alt=""
           aria-hidden
+          decoding="async"
+          fetchPriority="high"
           className="bg-fluid absolute inset-0 w-full h-full object-cover"
-        />
-        <img
-          src="/background.avif"
-          alt=""
-          aria-hidden
-          className="bg-fluid absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-screen"
-          style={{ animationDelay: '-14s, -4s', transform: 'scaleX(-1)' }}
         />
       </div>
 
-      {/* Ambient video on top — subtle motion blend */}
+      {/* Ambient video on top — subtle motion blend, defer load */}
       <video
         autoPlay
         loop
         muted
         playsInline
+        preload="metadata"
         poster="/background.avif"
         className="absolute inset-0 w-full h-full object-cover z-[1] opacity-30 mix-blend-screen pointer-events-none"
       >
@@ -56,7 +52,7 @@ export default function HeroSection() {
       {/* Navbar */}
       <nav className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 md:px-12 py-6">
         <Link to="/" className="flex items-center gap-3">
-          <img src="/logo.png" alt="MonadScope" className="w-9 h-9 object-contain" />
+          <img src="/logo.png" alt="MonadScope" decoding="async" className="w-9 h-9 object-contain" />
           <span className="text-white font-semibold text-lg tracking-tight">MonadScope</span>
         </Link>
         <div className="hidden md:flex items-center gap-8">

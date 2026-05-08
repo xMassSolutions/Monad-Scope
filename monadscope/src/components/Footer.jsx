@@ -11,7 +11,7 @@ export default function Footer() {
         className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6"
       >
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="MonadScope" className="w-7 h-7 object-contain" />
+          <img src="/logo.png" alt="MonadScope" decoding="async" loading="lazy" className="w-7 h-7 object-contain" />
           <span className="text-white/50 text-sm font-medium">MonadScope</span>
         </div>
         <p className="text-white/20 text-xs">© 2026 MonadScope</p>

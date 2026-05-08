@@ -50,7 +50,7 @@ export default function AppShell() {
       {/* Sidebar */}
       <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-white/8 p-4 sticky top-0 h-screen" style={{ background: 'rgba(0,0,0,0.4)' }}>
         <Link to="/" className="flex items-center gap-2 mb-8 px-2">
-          <img src="/logo.png" alt="MonadScope" className="w-7 h-7 object-contain" />
+          <img src="/logo.png" alt="MonadScope" decoding="async" className="w-7 h-7 object-contain" />
           <span className="text-white font-semibold text-sm tracking-tight">MonadScope</span>
         </Link>
 

@@ -66,7 +66,7 @@ export default function DashboardPreview() {
             {/* Sidebar */}
             <div className="hidden md:flex flex-col w-52 border-r border-white/8 p-4 gap-1" style={{ background: 'rgba(0,0,0,0.3)' }}>
               <div className="flex items-center gap-2 mb-6 px-2">
-                <img src="/logo.png" alt="MonadScope" className="w-6 h-6 object-contain" />
+                <img src="/logo.png" alt="MonadScope" decoding="async" loading="lazy" className="w-6 h-6 object-contain" />
                 <span className="text-white/80 text-sm font-semibold">MonadScope</span>
               </div>
               {['Contract intelligence', 'Project graph', 'Public library'].map((item, i) => (

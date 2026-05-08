@@ -7,6 +7,7 @@ import AppShell from './components/AppShell'
 import ContractIntelligence from './pages/ContractIntelligence'
 import Library from './pages/Library'
 import Projects from './pages/Projects'
+import Exploits from './pages/Exploits'
 
 function Landing() {
   return (
@@ -52,6 +53,7 @@ export default function App() {
           <Route path="library/high-risk" element={<Library kind="high-risk" />} />
           <Route path="projects" element={<Projects />} />
           <Route path="projects/:projectId" element={<Projects />} />
+          <Route path="exploits" element={<Exploits />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

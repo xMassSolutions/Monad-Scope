@@ -22,6 +22,7 @@ from app.repositories import contracts as contracts_repo
 from app.repositories import findings as findings_repo
 from app.repositories import projects as projects_repo
 from app.repositories import rulesets as rulesets_repo
+from app.services import exploit_match as exploit_match_svc
 from app.services import grouping as grouping_svc
 from app.services import scoring as scoring_svc
 from app.services.classifier import classify
@@ -133,12 +134,15 @@ async def enrich_contract(
         static_features=static_features, dynamic_features=df, weights=weights
     )
 
-    # 8. Scoring.
+    # 8. Match against the historical-exploit registry, then score.
+    finding_codes = [f.code for f in findings]
+    exploit_report = await exploit_match_svc.match_for_codes(session, finding_codes)
     verdict = scoring_svc.score(
         static_features=static_features,
         dynamic_features=df,
         findings=findings,
         weights=weights,
+        exploit_match=exploit_report,
     )
 
     # 9. Persist features + findings + analysis.

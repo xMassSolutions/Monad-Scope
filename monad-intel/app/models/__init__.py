@@ -3,6 +3,7 @@
 from app.models.analysis import ContractAnalysis
 from app.models.block import Block
 from app.models.contract import Contract, ContractDynamicFeatures, ContractStaticFeatures
+from app.models.exploit import Exploit
 from app.models.finding import ContractFinding
 from app.models.job import Job
 from app.models.outcome import Outcome
@@ -19,6 +20,7 @@ __all__ = [
     "ProjectContractLink",
     "ContractFinding",
     "ContractAnalysis",
+    "Exploit",
     "PrimeAnalysis",
     "Job",
     "Outcome",

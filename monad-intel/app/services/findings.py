@@ -47,6 +47,115 @@ HARD_FAIL_CODES = (
 )
 
 
+# Vulnerability taxonomy — broad categories drawn from the SlowMist
+# Blockchain Common Vulnerability List. Each entry pairs a MonadScope
+# finding code with the SlowMist category it represents and a short
+# description. Codes prefixed with `*` lack a static detector today but are
+# valid targets for exploit-feed mapping (so historical exploits still
+# calibrate them, and a future detector inherits the calibration).
+VULNERABILITY_TAXONOMY: dict[str, dict[str, str]] = {
+    "OWNER_CAN_MINT": {
+        "category": "Privilege Escalation",
+        "description": "Owner has uncapped mint access — direct path to dilution attacks.",
+    },
+    "PRIVILEGED_UNCAPPED_MINT": {
+        "category": "Privilege Escalation",
+        "description": "Mint privilege with no enforced cap — historically the root of many infinite-mint exploits.",
+    },
+    "BLACKLIST_FUNCTION": {
+        "category": "Privilege Escalation",
+        "description": "Owner can blacklist holders, locking funds in place.",
+    },
+    "TRADING_CAN_PAUSE": {
+        "category": "Privilege Escalation",
+        "description": "Owner can globally halt all transfers.",
+    },
+    "OWNER_CAN_CHANGE_FEES": {
+        "category": "Privilege Escalation",
+        "description": "Tax / fee parameters mutable by the owner — soft rug vector.",
+    },
+    "ADMIN_CAN_WITHDRAW_USER_FUNDS": {
+        "category": "Access Control",
+        "description": "Privileged role can drain user balances.",
+    },
+    "BLACKLIST_PLUS_TRADING_GATE": {
+        "category": "Honeypot",
+        "description": "Blacklist combined with global pause = canonical honeypot.",
+    },
+    "HIDDEN_TRANSFER_RESTRICTIONS": {
+        "category": "Honeypot",
+        "description": "Transfer paths gated by hidden allowlists or runtime checks.",
+    },
+    "PRIVILEGED_LIQUIDITY_EXTRACTION": {
+        "category": "Rug Pull",
+        "description": "Owner-callable liquidity removal — terminal rug risk.",
+    },
+    "LP_UNLOCKED": {
+        "category": "Rug Pull",
+        "description": "Liquidity pool tokens are not time-locked.",
+    },
+    "TOP_HOLDER_CONCENTRATION_HIGH": {
+        "category": "Centralisation",
+        "description": "A few wallets hold disproportionate supply.",
+    },
+    "UPGRADEABLE_PROXY": {
+        "category": "Upgradeability",
+        "description": "Logic can be hot-swapped by the proxy admin.",
+    },
+    "IMPLEMENTATION_UNVERIFIED": {
+        "category": "Upgradeability",
+        "description": "Proxy points at unverified bytecode — opaque logic.",
+    },
+    "IMPLEMENTATION_CHANGED_RECENTLY": {
+        "category": "Upgradeability",
+        "description": "Implementation pointer mutated within the rolling window.",
+    },
+    "UNVERIFIED_CONTRACT": {
+        "category": "Verification",
+        "description": "Source not published; static analysis is bytecode-only.",
+    },
+    "DEPLOYER_REUSED_SUSPICIOUS_BYTECODE": {
+        "category": "Reputation",
+        "description": "Deployer address has shipped flagged contracts before.",
+    },
+    "OWNER_CHANGED_RECENTLY": {
+        "category": "Key Compromise",
+        "description": "Ownership transfer within the rolling window — possible key-loss event.",
+    },
+    "MAX_WALLET_CONTROLS": {
+        "category": "Trading Restrictions",
+        "description": "Per-wallet holding caps configurable by owner.",
+    },
+    "MAX_TX_CONTROLS": {
+        "category": "Trading Restrictions",
+        "description": "Per-transaction caps configurable by owner.",
+    },
+    # SlowMist-derived: no static detector yet, but historical exploits
+    # mapping to these codes still feed the calibration so they are ready
+    # for the day a detector is added.
+    "*ORACLE_PRICE_MANIPULATION": {
+        "category": "Oracle",
+        "description": "Single-source or flash-loan-manipulable price feed (SlowMist: Oracle Price Manipulation).",
+    },
+    "*MEV_VULNERABILITY": {
+        "category": "MEV",
+        "description": "Logic susceptible to front-running, sandwiching, or ordering attacks (SlowMist: MEV).",
+    },
+    "*CROSS_CHAIN_VERIFICATION_WEAK": {
+        "category": "Cross-chain",
+        "description": "Bridge message verification is forgeable (SlowMist: Forged Cross-Chain Message).",
+    },
+    "*FALSE_TOPUP_VULNERABILITY": {
+        "category": "Accounting",
+        "description": "Receipt parser does not validate token movement vs metadata (SlowMist: False Top-Up).",
+    },
+    "*TRANSACTION_REPLAY": {
+        "category": "Replay",
+        "description": "Missing nonce / chain-id binding allows replay across chains or branches (SlowMist: Replay Attack).",
+    },
+}
+
+
 def _severity_for_weight(w: int) -> str:
     if w >= 100:
         return "critical"

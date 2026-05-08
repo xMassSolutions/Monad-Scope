@@ -5,58 +5,13 @@ import { Link } from 'react-router-dom'
 export default function HeroSection() {
   return (
     <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden">
-      {/* Fluid drifting background — two layers with offset timing for parallax */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <img
-          src="/background.avif"
-          alt=""
-          aria-hidden
-          className="bg-fluid absolute inset-0 w-full h-full object-cover"
-        />
-        <img
-          src="/background.avif"
-          alt=""
-          aria-hidden
-          className="bg-fluid absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-screen"
-          style={{ animationDelay: '-14s, -4s', transform: 'scaleX(-1)' }}
-        />
-      </div>
-
-      {/* Ambient video on top — subtle motion blend */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        poster="/background.avif"
-        className="absolute inset-0 w-full h-full object-cover z-[1] opacity-30 mix-blend-screen pointer-events-none"
-      >
-        <source
-          src="https://res.cloudinary.com/dfonotyfb/video/upload/v1775585556/dds3_1_rqhg7x.mp4"
-          type="video/mp4"
-        />
-      </video>
-
-      {/* Dark overlay — radial vignette + bottom fade for text legibility */}
-      <div
-        className="absolute inset-0 z-10"
-        style={{
-          background:
-            'radial-gradient(ellipse at center, rgba(10,10,11,0.55) 0%, rgba(10,10,11,0.75) 60%, rgba(10,10,11,0.92) 100%)',
-        }}
-      />
-      <div
-        className="absolute inset-0 z-10"
-        style={{
-          background:
-            'linear-gradient(to bottom, rgba(10,10,11,0.4) 0%, rgba(10,10,11,0) 25%, rgba(10,10,11,0) 70%, rgba(10,10,11,0.95) 100%)',
-        }}
-      />
+      {/* Hero shares the page-wide fluid backdrop — no local overlay, so the
+          section blends seamlessly into the rest of the landing page. */}
 
       {/* Navbar */}
       <nav className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 md:px-12 py-6">
         <Link to="/" className="flex items-center gap-3">
-          <img src="/logo.png" alt="MonadScope" className="w-9 h-9 object-contain" />
+          <img src="/logo.png" alt="MonadScope" decoding="async" className="w-9 h-9 object-contain" />
           <span className="text-white font-semibold text-lg tracking-tight">MonadScope</span>
         </Link>
         <div className="hidden md:flex items-center gap-8">
@@ -148,9 +103,9 @@ export default function HeroSection() {
           className="flex items-center gap-10 mt-16"
         >
           {[
-            { value: '58M+', label: 'Blocks Scanned' },
-            { value: '4.2K', label: 'Contracts Analyzed' },
-            { value: '0.7s', label: 'Avg Queue Lag' },
+            { value: '143', label: 'Monad Mainnet · chain id' },
+            { value: 'Voted', label: 'block finality · no reorgs' },
+            { value: 'WSS', label: 'streaming ingest' },
           ].map(({ value, label }) => (
             <div key={label} className="flex flex-col items-center gap-1">
               <span className="text-white font-bold text-2xl tracking-tight">{value}</span>

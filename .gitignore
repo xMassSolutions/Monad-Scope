@@ -25,3 +25,8 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Foundry build artifacts
+contracts/cache/
+contracts/out/
+contracts/broadcast/

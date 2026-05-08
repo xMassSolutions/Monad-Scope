@@ -1,0 +1,46 @@
+# Fly.io config for Monad Scope backend.
+# Two processes: the public HTTP API and the always-on Monad WSS listener.
+#
+# First-time setup:
+#   flyctl launch --no-deploy --name monadscope-api --region iad
+#   flyctl secrets set DATABASE_URL=...  REDIS_URL=...  CORS_ALLOW_ORIGINS=https://your-vercel-domain.vercel.app  ETHERSCAN_API_KEY=...  PRIVY_APP_ID=...  PRIVY_APP_SECRET=...
+#   flyctl deploy
+
+app = "monadscope-api"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[processes]
+  api = "uvicorn app.main:app --host 0.0.0.0 --port 8000"
+  listener = "python scripts/run_listener.py"
+
+[env]
+  APP_ENV = "production"
+  LOG_LEVEL = "INFO"
+  MONAD_CHAIN = "monad"
+  MONAD_CHAIN_ID = "143"
+  MONAD_RPC_HTTP = "https://rpc.monad.xyz,https://rpc1.monad.xyz,https://rpc2.monad.xyz"
+  MONAD_RPC_WS = "wss://rpc.monad.xyz"
+  MONAD_WS_SUBSCRIPTION = "newHeads"
+  PYTHONUNBUFFERED = "1"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["api"]
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 200
+    hard_limit = 250
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
+  processes = ["api", "listener"]

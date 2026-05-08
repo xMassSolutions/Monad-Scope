@@ -144,9 +144,9 @@ export default function HeroSection() {
           className="flex items-center gap-10 mt-16"
         >
           {[
-            { value: '58M+', label: 'Blocks Scanned' },
-            { value: '4.2K', label: 'Contracts Analyzed' },
-            { value: '0.7s', label: 'Avg Queue Lag' },
+            { value: '143', label: 'Monad Mainnet · chain id' },
+            { value: 'Voted', label: 'block finality · no reorgs' },
+            { value: 'WSS', label: 'streaming ingest' },
           ].map(({ value, label }) => (
             <div key={label} className="flex flex-col items-center gap-1">
               <span className="text-white font-bold text-2xl tracking-tight">{value}</span>

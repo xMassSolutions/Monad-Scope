@@ -50,8 +50,11 @@ export default function DashboardPreview() {
             Contract Intelligence Dashboard
           </h2>
           <p className="text-white/40 text-base max-w-md mx-auto">
-            Real-time risk scoring, findings, and linked contract graphs — all in one view.
+            Risk score, findings, and prime status — every Monad contract in one unified view.
           </p>
+          <div className="mt-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-white/10 text-[10px] uppercase tracking-widest text-white/40">
+            <span className="w-1 h-1 rounded-full bg-amber-400" /> Demo · sample contract
+          </div>
         </div>
 
         {/* Dashboard mockup */}

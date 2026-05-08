@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { Search, RefreshCw, ExternalLink, AlertTriangle, ShieldCheck, Globe, Sparkles } from 'lucide-react'
+import { Search, RefreshCw, ExternalLink, AlertTriangle, ShieldCheck, Globe, Sparkles, Skull } from 'lucide-react'
 import { api } from '../lib/api'
-import { actionColor, formatTime, shortAddr, tierColor } from '../lib/format'
+import { actionColor, formatTime, formatUsd, shortAddr, tierColor } from '../lib/format'
 
 function Badge({ children, className = '' }) {
   return (
@@ -25,7 +25,7 @@ function Stat({ label, value, badge, badgeClass }) {
   )
 }
 
-function FindingItem({ f }) {
+function FindingItem({ f, calib }) {
   return (
     <div className="rounded-xl p-4 border border-white/8 hover:border-white/20 transition-colors" style={{ background: 'rgba(255,255,255,0.03)' }}>
       <div className="flex items-start justify-between gap-3 mb-2">
@@ -40,12 +40,74 @@ function FindingItem({ f }) {
         {typeof f.weight === 'number' && <span>weight {f.weight.toFixed(2)}</span>}
         {typeof f.confidence === 'number' && <span>confidence {(f.confidence * 100).toFixed(0)}%</span>}
       </div>
+      {calib && calib.incident_count > 0 && (
+        <div className="mt-2 pt-2 border-t border-white/8 flex items-center gap-2 text-[10px]">
+          <Skull size={10} className="text-rose-400" />
+          <span className="text-rose-400/90">
+            {calib.incident_count} historical exploit{calib.incident_count === 1 ? '' : 's'} ·{' '}
+            {formatUsd(calib.total_loss_usd)} lost
+          </span>
+          <span className="text-white/40">→ +{(calib.bonus ?? 0).toFixed(2)} pts</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ExploitCalibration({ calibration }) {
+  if (!calibration) return null
+  const perCode = calibration.per_code || {}
+  const codes = Object.values(perCode).sort((a, b) => (b.bonus ?? 0) - (a.bonus ?? 0))
+  if (codes.length === 0) return null
+  const totalLoss = codes.reduce((acc, c) => acc + (c.total_loss_usd || 0), 0)
+  const totalIncidents = codes.reduce((acc, c) => acc + (c.incident_count || 0), 0)
+  return (
+    <div className="rounded-2xl border border-rose-500/20 p-5" style={{ background: 'rgba(255,61,119,0.04)' }}>
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+        <div className="flex items-center gap-2">
+          <Skull size={14} className="text-rose-400" />
+          <h3 className="text-white text-sm font-semibold">Historical-exploit calibration</h3>
+        </div>
+        <div className="flex items-center gap-3 text-[11px] text-white/50">
+          <span>+{(calibration.total_bonus ?? 0).toFixed(2)} risk pts</span>
+          <span>·</span>
+          <span>{totalIncidents} incidents</span>
+          <span>·</span>
+          <span className="text-rose-400">{formatUsd(totalLoss)} losses</span>
+        </div>
+      </div>
+      <p className="text-white/50 text-xs leading-relaxed mb-3">
+        Findings on this contract overlap with patterns from past exploits. The calibrated bonus is
+        added to the risk score; click a code to see the matching incidents.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        {codes.map((c) => (
+          <Link
+            key={c.code}
+            to={`/app/exploits?code=${encodeURIComponent(c.code)}`}
+            className="flex items-center justify-between gap-3 rounded-lg border border-white/8 hover:border-rose-500/40 transition-colors p-3"
+            style={{ background: 'rgba(255,255,255,0.02)' }}
+          >
+            <div className="min-w-0">
+              <div className="text-white text-xs font-mono truncate">{c.code}</div>
+              <div className="text-white/40 text-[10px] mt-0.5">
+                {c.incident_count} incident{c.incident_count === 1 ? '' : 's'} ·{' '}
+                <span className="text-rose-400">{formatUsd(c.total_loss_usd)}</span>
+              </div>
+            </div>
+            <div className="text-rose-400 text-xs font-semibold tabular-nums shrink-0">
+              +{(c.bonus ?? 0).toFixed(2)}
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }
 
 function ContractView({ data, refresh, refreshing }) {
   const c = data.contract
+  const calibration = data.latest_analysis?.summary_json?.exploit_calibration
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -148,6 +210,9 @@ function ContractView({ data, refresh, refreshing }) {
         </div>
       )}
 
+      {/* Historical-exploit calibration */}
+      <ExploitCalibration calibration={calibration} />
+
       {/* Findings */}
       <div>
         <div className="flex items-center justify-between mb-3">
@@ -160,9 +225,10 @@ function ContractView({ data, refresh, refreshing }) {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {data.findings.map((f, i) => (
-              <FindingItem key={f.id || i} f={f} />
-            ))}
+            {data.findings.map((f, i) => {
+              const calib = calibration?.per_code?.[f.code?.toUpperCase?.()]
+              return <FindingItem key={f.id || i} f={f} calib={calib} />
+            })}
           </div>
         )}
       </div>

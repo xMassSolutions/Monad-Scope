@@ -7,8 +7,10 @@ import asyncio
 from fastapi import APIRouter, BackgroundTasks
 from pydantic import BaseModel, Field
 
+from app.db import session_scope
 from app.logging import get_logger
 from app.services import bootstrap as bootstrap_svc
+from app.services import exploit_feed as exploit_feed_svc
 from app.services import ws_listener as ws
 from app.services.rpc import JsonRpcClient
 from app.services.verifier import Verifier
@@ -107,3 +109,11 @@ async def scheduler_run_due(batch: int = 50) -> dict:
     finally:
         await rpc.close()
     return {"status": "ok", "processed": n}
+
+
+@router.post("/exploits/sync")
+async def exploits_sync() -> dict:
+    """Pull the DefiLlama Hacks dataset and upsert it into the exploit registry."""
+    async with session_scope() as session:
+        result = await exploit_feed_svc.sync_defillama(session)
+    return {"status": "ok", **result}

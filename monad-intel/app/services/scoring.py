@@ -1,8 +1,13 @@
 """Pure scoring engine.
 
-Signature: (features, findings, ruleset) -> Verdict
+Signature: (features, findings, ruleset, exploit_match?) -> Verdict
 This module reads no globals. The active ruleset is passed in by the caller,
 which is what makes shadow-replay against historical data safe.
+
+If a `MatchReport` from app.services.exploit_match is passed in, its
+calibrated bonus is added to the risk score (capped) and its evidence is
+exposed in `summary.exploit_calibration`. Without it, scoring behaves
+exactly as before — the exploit registry is purely additive.
 """
 
 from __future__ import annotations
@@ -11,6 +16,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.models.finding import ContractFinding
+from app.services.exploit_match import MatchReport
 from app.services.findings import HARD_FAIL_CODES, WEIGHTED_FLAGS
 
 
@@ -80,6 +86,7 @@ def score(
     dynamic_features: dict[str, Any],
     findings: list[ContractFinding],
     weights: dict[str, int] | None = None,
+    exploit_match: MatchReport | None = None,
 ) -> Verdict:
     weights = {**WEIGHTED_FLAGS, **(weights or {})}
     sf = static_features or {}
@@ -89,8 +96,12 @@ def score(
 
     # Risk = clipped weighted sum of non-hard-fail findings.
     weighted_total = sum(weights.get(f.code, f.weight) for f in findings if f.code not in HARD_FAIL_CODES)
+    # Historical-exploit calibration. Adds a bonded bonus when the contract's
+    # findings overlap with patterns that have caused real losses in the past.
+    exploit_bonus = float(exploit_match.total_bonus) if exploit_match else 0.0
+    raw_risk = float(weighted_total) + exploit_bonus
     # Soft cap: each weighted point worth ~1 risk-score point, capped at 95 to leave room for hard-fail.
-    risk = min(95.0, float(weighted_total))
+    risk = min(95.0, raw_risk)
     if has_hard_fail:
         risk = max(risk, 90.0)
 
@@ -98,12 +109,15 @@ def score(
     action = ACTION_BY_TIER[tier]
     confidence, unknowns = _confidence(sf, df)
 
-    summary = {
+    summary: dict[str, Any] = {
         "weighted_finding_total": weighted_total,
         "hard_fail_codes": [f.code for f in findings if f.code in HARD_FAIL_CODES],
         "non_hard_fail_codes": [f.code for f in findings if f.code not in HARD_FAIL_CODES],
         "ruleset_weight_count": len(weights),
+        "exploit_bonus": round(exploit_bonus, 3),
     }
+    if exploit_match is not None:
+        summary["exploit_calibration"] = exploit_match.as_dict()
     return Verdict(
         risk_score=round(risk, 2),
         confidence_score=round(confidence, 3),

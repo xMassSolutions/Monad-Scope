@@ -9,6 +9,7 @@ const AppShell = lazy(() => import('./components/AppShell'))
 const ContractIntelligence = lazy(() => import('./pages/ContractIntelligence'))
 const Library = lazy(() => import('./pages/Library'))
 const Projects = lazy(() => import('./pages/Projects'))
+const Exploits = lazy(() => import('./pages/Exploits'))
 
 function Landing() {
   return (
@@ -63,6 +64,7 @@ export default function App() {
             <Route path="library/high-risk" element={<Library kind="high-risk" />} />
             <Route path="projects" element={<Projects />} />
             <Route path="projects/:projectId" element={<Projects />} />
+            <Route path="exploits" element={<Exploits />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

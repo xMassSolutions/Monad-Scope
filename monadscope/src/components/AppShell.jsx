@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
-import { Activity, Search, Library, Network, ShieldAlert } from 'lucide-react'
+import { Activity, Search, Library, Network, ShieldAlert, Skull } from 'lucide-react'
 import ContractPill from './ContractPill'
 
 function StatusPill() {
@@ -80,6 +80,12 @@ export default function AppShell() {
             className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkIdle}`}
           >
             <Network size={15} /> Projects
+          </NavLink>
+          <NavLink
+            to="/app/exploits"
+            className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkIdle}`}
+          >
+            <Skull size={15} /> Exploit registry
           </NavLink>
         </nav>
 

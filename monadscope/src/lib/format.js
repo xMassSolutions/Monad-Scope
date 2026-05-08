@@ -41,3 +41,12 @@ export function formatTime(iso) {
     return iso
   }
 }
+
+export function formatUsd(n) {
+  if (n == null || Number.isNaN(n)) return '—'
+  const v = Number(n)
+  if (v >= 1_000_000_000) return `$${(v / 1_000_000_000).toFixed(1)}B`
+  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`
+  if (v >= 1_000) return `$${(v / 1_000).toFixed(1)}K`
+  return `$${v.toFixed(0)}`
+}

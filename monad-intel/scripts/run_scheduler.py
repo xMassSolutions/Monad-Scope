@@ -1,4 +1,4 @@
-"""CLI: run the rescan scheduler + regroup loops."""
+"""CLI: run the rescan scheduler + regroup + exploit-sync loops."""
 
 from __future__ import annotations
 
@@ -9,13 +9,14 @@ import typer
 from app.logging import configure_logging
 from app.services.rpc import JsonRpcClient
 from app.services.verifier import Verifier
+from app.workers import exploit_sync as exploit_sync_worker
 from app.workers import regroup as regroup_worker
 from app.workers import rescans as rescans_worker
 
-app = typer.Typer(help="Run rescan + regroup loops.")
+app = typer.Typer(help="Run rescan + regroup + exploit-sync loops.")
 
 
-async def _run(rescan_every: int, regroup_every: int) -> None:
+async def _run(rescan_every: int, regroup_every: int, exploit_every: int) -> None:
     configure_logging()
     rpc = JsonRpcClient()
     verifier = Verifier()
@@ -23,6 +24,7 @@ async def _run(rescan_every: int, regroup_every: int) -> None:
         await asyncio.gather(
             rescans_worker.loop(rpc, verifier, every_seconds=rescan_every),
             regroup_worker.loop(every_seconds=regroup_every),
+            exploit_sync_worker.loop(every_seconds=exploit_every),
         )
     finally:
         await rpc.close()
@@ -32,8 +34,9 @@ async def _run(rescan_every: int, regroup_every: int) -> None:
 def main(
     rescan_every: int = typer.Option(60, "--rescan-every"),
     regroup_every: int = typer.Option(600, "--regroup-every"),
+    exploit_every: int = typer.Option(6 * 3600, "--exploit-every"),
 ) -> None:
-    asyncio.run(_run(rescan_every, regroup_every))
+    asyncio.run(_run(rescan_every, regroup_every, exploit_every))
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 import { motion } from 'motion/react'
+import ContractPill from './ContractPill'
 
 function GithubIcon({ size = 14 }) {
   return (
@@ -29,16 +30,18 @@ export default function Footer() {
           <img src="/logo.png" alt="MonadScope" decoding="async" loading="lazy" className="w-7 h-7 object-contain" />
           <span className="text-white/50 text-sm font-medium">MonadScope</span>
         </div>
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3 flex-wrap justify-center">
           <a
             href="https://github.com/xMassSolutions/Monad-Scope"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-2 text-white/50 hover:text-white text-xs font-medium transition-colors"
+            aria-label="GitHub repository"
+            title="GitHub repository"
+            className="w-8 h-8 flex items-center justify-center rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
           >
             <GithubIcon size={14} />
-            <span>xMassSolutions/Monad-Scope</span>
           </a>
+          <ContractPill address="0x1051bC8E0b7a986aae8117F631B0E155185515f5" />
           <p className="text-white/20 text-xs">© 2026 MonadScope</p>
         </div>
       </motion.div>

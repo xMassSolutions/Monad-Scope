@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { Activity, Search, Library, Network, ShieldAlert } from 'lucide-react'
+import ContractPill from './ContractPill'
 
 function StatusPill() {
   const [health, setHealth] = useState(null)
@@ -94,7 +95,10 @@ export default function AppShell() {
             <Activity size={14} className="text-cyan-400" />
             <span>Live ingest · Monad mainnet</span>
           </div>
-          <StatusPill />
+          <div className="flex items-center gap-3">
+            <ContractPill address="0x1051bC8E0b7a986aae8117F631B0E155185515f5" />
+            <StatusPill />
+          </div>
         </header>
         <div className="p-6 md:p-8">
           <Outlet />

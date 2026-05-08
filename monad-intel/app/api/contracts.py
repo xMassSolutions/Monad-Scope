@@ -82,6 +82,7 @@ async def analyze_now(address: str, session: AsyncSession = Depends(get_session)
     verifier = Verifier()
     try:
         await enrichment_svc.enrich_contract(session, rpc, verifier, c, stage="refined")
+        await session.commit()
     finally:
         await rpc.close()
     return await get_contract(address, session=session)

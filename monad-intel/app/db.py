@@ -6,6 +6,7 @@ import os
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -44,6 +45,10 @@ def get_engine() -> AsyncEngine:
             )
             # asyncpg uses server_settings rather than libpq "options".
             connect_args["server_settings"] = {"search_path": f"{schema},public"}
+            # Supabase transaction-mode pooler (port 6543) does not support
+            # prepared statements — disable them so asyncpg works through it.
+            connect_args["statement_cache_size"] = 0
+            connect_args["prepared_statement_cache_size"] = 0
 
         _engine = create_async_engine(
             settings.database_url,
@@ -52,6 +57,26 @@ def get_engine() -> AsyncEngine:
             future=True,
             connect_args=connect_args,
         )
+
+        # Supabase's pooler ignores asyncpg's `server_settings` startup
+        # parameters, so we set the search_path explicitly on every new
+        # underlying connection. This event runs once per physical connection,
+        # so it has no per-query overhead.
+        if is_pg:
+            schema_for_event = (
+                getattr(settings, "database_schema", None)
+                or os.getenv("DATABASE_SCHEMA")
+                or "monadscope"
+            )
+
+            @event.listens_for(_engine.sync_engine, "connect")
+            def _set_search_path(dbapi_conn, _record) -> None:
+                cursor = dbapi_conn.cursor()
+                try:
+                    cursor.execute(f'SET search_path TO {schema_for_event}, public')
+                finally:
+                    cursor.close()
+
     return _engine
 
 

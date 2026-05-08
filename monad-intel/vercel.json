@@ -16,12 +16,12 @@
   ],
   "crons": [
     {
-      "path": "/cron/poll?batch=10",
-      "schedule": "*/1 * * * *"
+      "path": "/cron/poll?batch=50",
+      "schedule": "0 6 * * *"
     },
     {
-      "path": "/cron/backfill?batch=20",
-      "schedule": "*/5 * * * *"
+      "path": "/cron/backfill?batch=100",
+      "schedule": "30 6 * * *"
     }
   ]
 }

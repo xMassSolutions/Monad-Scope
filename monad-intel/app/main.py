@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
 from app.api import get_api_router
-from app.db import session_scope
+from app.db import Base, get_engine, session_scope
 from app.logging import configure_logging, get_logger
 from app.repositories import exploits as exploits_repo
 from app.services import exploit_feed as exploit_feed_svc
@@ -23,6 +23,17 @@ log = get_logger(__name__)
 async def lifespan(app: FastAPI):
     configure_logging()
     log.info("app.startup", version=__version__)
+    # Ensure all ORM tables exist. `create_all` is idempotent — it only
+    # creates tables that are missing, so it's safe to run on every cold
+    # start. Once we adopt Alembic this can move into a migration.
+    try:
+        # Import models so every Table is registered on Base.metadata.
+        from app import models  # noqa: F401
+        engine = get_engine()
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+    except Exception as e:  # noqa: BLE001
+        log.warning("app.create_tables_failed", err=str(e))
     # Bootstrap ruleset v1 if absent. Idempotent.
     try:
         async with session_scope() as session:

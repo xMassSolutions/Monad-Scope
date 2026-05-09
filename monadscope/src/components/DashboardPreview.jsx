@@ -1,37 +1,9 @@
 import { motion } from 'motion/react'
-import { TrendingUp, AlertTriangle, CheckCircle, Globe, MessageCircle, X } from 'lucide-react'
-
-function RiskBadge({ level }) {
-  const styles = {
-    Critical: 'bg-red-500/20 text-red-400 border border-red-500/30',
-    Info: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
-    Success: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
-  }
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${styles[level]}`}>
-      {level}
-    </span>
-  )
-}
-
-function FindingCard({ title, summary, risk, color }) {
-  const borderColors = {
-    red: 'border-l-red-500',
-    teal: 'border-l-teal-400',
-    green: 'border-l-emerald-400',
-  }
-  return (
-    <div className={`flex-shrink-0 w-48 rounded-xl p-3 border border-white/8 border-l-2 ${borderColors[color]}`} style={{ background: 'rgba(255,255,255,0.04)' }}>
-      <p className="text-white/80 text-[11px] font-medium leading-snug mb-2">{title}</p>
-      <p className="text-white/40 text-[10px] leading-snug mb-3">{summary}</p>
-      <RiskBadge level={risk} />
-    </div>
-  )
-}
+import { Globe, MessageCircle, X } from 'lucide-react'
+import RiskBadge from './dashboard/RiskBadge'
+import FindingCard from './dashboard/FindingCard'
 
 export default function DashboardPreview() {
-  const chartData = [320, 480, 290, 610, 520, 780, 690, 820, 750, 910]
-
   return (
     <section id="app-shell" className="w-full py-24 px-6 md:px-12 overflow-hidden scroll-mt-16">
       <motion.div

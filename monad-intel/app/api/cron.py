@@ -11,7 +11,9 @@ Vercel auto-injects this when running cron jobs (matching the project env var).
 
 from __future__ import annotations
 
+import asyncio
 import os
+import time
 
 from fastapi import APIRouter, Header, HTTPException, Query
 from sqlalchemy import select
@@ -38,51 +40,73 @@ def _check(authorization: str | None) -> None:
 @router.get("/cron/poll")
 async def cron_poll(
     authorization: str | None = Header(default=None),
-    batch: int = Query(default=10, ge=1, le=50),
+    batch: int = Query(default=10, ge=1, le=100),
+    duration: int = Query(default=0, ge=0, le=290),
 ) -> dict:
     """Poll the latest N blocks from chain head and ingest any we have not seen.
 
-    Replaces the WSS listener for serverless deployments. Run on a 1-minute
-    Vercel Cron schedule.
+    Replaces the WSS listener for serverless deployments. Vercel cron is
+    hard-floored at 1 minute, but Monad mainnet produces a block every ~0.5s
+    and finalizes in ~1s. To track finality we therefore loop *inside* a
+    single invocation: each tick polls head, ingests unseen blocks, sleeps
+    briefly, and repeats until `duration` seconds have elapsed. The next
+    minute-cron relights the loop, so successive ticks chain together with
+    no gap. Pass `duration=0` (default) for a single-pass invocation.
     """
     _check(authorization)
     rpc = JsonRpcClient()
     processor = blocks_worker.BlockProcessor(rpc)
+    deadline = (time.monotonic() + duration) if duration > 0 else None
+    total_processed = 0
+    total_skipped = 0
+    last_head: int | None = None
+    iterations = 0
     try:
-        head = await rpc.block_number()
-        target_from = head - batch + 1
+        while True:
+            iterations += 1
+            head = await rpc.block_number()
+            last_head = head
+            target_from = max(0, head - batch + 1)
 
-        # Find which blocks in [target_from, head] are not yet in our DB.
-        async with session_scope() as session:
-            res = await session.execute(
-                select(Block.number).where(
-                    Block.number >= target_from, Block.number <= head
+            # Find which blocks in [target_from, head] are not yet in our DB.
+            async with session_scope() as session:
+                res = await session.execute(
+                    select(Block.number).where(
+                        Block.number >= target_from, Block.number <= head
+                    )
                 )
-            )
-            already = {row[0] for row in res.all()}
+                already = {row[0] for row in res.all()}
 
-        to_process = [n for n in range(target_from, head + 1) if n not in already]
-        processed = 0
-        for n in to_process:
-            try:
-                await processor.process(n)
-                processed += 1
-            except Exception as e:  # noqa: BLE001
-                log.warning("cron.poll.block_failed", number=n, err=str(e))
+            to_process = [n for n in range(target_from, head + 1) if n not in already]
+            total_skipped += len(already)
+
+            for n in to_process:
+                try:
+                    await processor.process(n)
+                    total_processed += 1
+                except Exception as e:  # noqa: BLE001
+                    log.warning("cron.poll.block_failed", number=n, err=str(e))
+
+            if deadline is None or time.monotonic() >= deadline:
+                break
+            # Pace to Monad's ~0.5s block time; back off slightly when caught up.
+            await asyncio.sleep(0.5 if to_process else 1.0)
 
         log.info(
             "cron.poll.done",
-            head=head,
+            head=last_head,
             batch=batch,
-            already=len(already),
-            processed=processed,
+            duration=duration,
+            iterations=iterations,
+            processed=total_processed,
         )
         return {
             "status": "ok",
-            "head": head,
+            "head": last_head,
             "considered": batch,
-            "skipped_already_seen": len(already),
-            "processed": processed,
+            "duration": duration,
+            "iterations": iterations,
+            "processed": total_processed,
         }
     finally:
         await rpc.close()

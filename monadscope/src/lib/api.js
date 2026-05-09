@@ -16,6 +16,7 @@ async function request(path, opts = {}) {
 
 export const api = {
   health: () => request('/health'),
+  liveStatus: () => request('/live/status'),
 
   getContract: (address) => request(`/contracts/${address}`),
   getFindings: (address) => request(`/contracts/${address}/findings`),

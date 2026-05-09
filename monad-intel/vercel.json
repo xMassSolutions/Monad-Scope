@@ -13,15 +13,5 @@
   ],
   "routes": [
     { "src": "/(.*)", "dest": "api/index.py" }
-  ],
-  "crons": [
-    {
-      "path": "/cron/poll?batch=50&duration=55",
-      "schedule": "* * * * *"
-    },
-    {
-      "path": "/cron/backfill?batch=100",
-      "schedule": "*/5 * * * *"
-    }
   ]
 }
